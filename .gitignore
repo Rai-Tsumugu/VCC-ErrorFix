@@ -1,0 +1,21 @@
+# Unity
+Library/
+Temp/
+obj/
+Build/
+Builds/
+Logs/
+UserSettings/
+*.csproj
+*.sln
+*.user
+*.unityproj
+.DS_Store
+
+# MCP Server
+mcp-server/node_modules/
+mcp-server/dist/
+
+# VSCode
+.vscode/settings.json
+.vscode/launch.json
