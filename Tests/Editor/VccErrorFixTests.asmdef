@@ -1,0 +1,25 @@
+{
+  "name": "RaiTsumugu.VccErrorFix.Tests.Editor",
+  "rootNamespace": "RaiTsumugu.VccErrorFix.Tests.Editor",
+  "references": [
+    "RaiTsumugu.VccErrorFix.Editor",
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "nunit.framework.dll"
+  ],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}
