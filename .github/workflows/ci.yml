@@ -1,0 +1,136 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ─── MCP Server (TypeScript) ─────────────────────────────────────────────
+  mcp-server:
+    name: MCP Server (Node.js)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mcp-server
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: mcp-server/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (TypeScript)
+        run: npm run build
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcp-coverage
+          path: mcp-server/coverage/
+          retention-days: 7
+
+  # ─── Unity Package Validation ─────────────────────────────────────────────
+  # Full C# unit tests require a Unity Editor license (run locally via
+  # Unity Test Runner: Window > General > Test Runner > EditMode).
+  # This job validates the package structure without Unity.
+  unity-package:
+    name: Unity Package Structure
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate UPM package.json
+        run: |
+          echo "=== Validating package.json ==="
+          python3 -c "
+          import json, sys
+          with open('package.json') as f:
+              pkg = json.load(f)
+          required = ['name', 'version', 'displayName', 'unity', 'type']
+          for key in required:
+              assert key in pkg, f'Missing required key: {key}'
+          assert pkg['name'].startswith('com.'), f'Package name must start with com.: {pkg[\"name\"]}'
+          print(f'  name: {pkg[\"name\"]}')
+          print(f'  version: {pkg[\"version\"]}')
+          print(f'  unity: {pkg[\"unity\"]}')
+          print('package.json OK')
+          "
+
+      - name: Validate asmdef files are valid JSON
+        run: |
+          echo "=== Validating .asmdef files ==="
+          find . -name "*.asmdef" -not -path "./.git/*" | while read f; do
+            python3 -c "
+          import json, sys
+          with open('$f') as file:
+              data = json.load(file)
+          assert 'name' in data, 'Missing name field'
+          print(f'  $f: OK (name={data[\"name\"]})')
+            "
+          done
+
+      - name: Verify required Editor scripts exist
+        run: |
+          echo "=== Checking required source files ==="
+          required=(
+            "Editor/ErrorData.cs"
+            "Editor/ErrorCollector.cs"
+            "Editor/HttpServer.cs"
+            "Editor/ErrorFixSettings.cs"
+            "Editor/ErrorFixEditorWindow.cs"
+            "Editor/VccErrorFixEditor.asmdef"
+            "Editor/AssemblyInfo.cs"
+          )
+          for f in "${required[@]}"; do
+            if [ -f "$f" ]; then
+              echo "  $f: found"
+            else
+              echo "  ERROR: $f is missing" >&2
+              exit 1
+            fi
+          done
+
+      - name: Verify test files exist
+        run: |
+          echo "=== Checking test files ==="
+          required=(
+            "Tests/Editor/VccErrorFixTests.asmdef"
+            "Tests/Editor/ErrorDataTests.cs"
+            "Tests/Editor/ErrorCollectorTests.cs"
+            "Tests/Editor/ErrorFixSettingsTests.cs"
+          )
+          for f in "${required[@]}"; do
+            if [ -f "$f" ]; then
+              echo "  $f: found"
+            else
+              echo "  ERROR: $f is missing" >&2
+              exit 1
+            fi
+          done
+
+      - name: Check C# files for obvious syntax issues
+        run: |
+          echo "=== Checking C# namespace declarations ==="
+          for f in Editor/*.cs Tests/Editor/*.cs; do
+            [ -f "$f" ] || continue
+            # Each file should declare a namespace
+            if ! grep -q "namespace RaiTsumugu.VccErrorFix" "$f"; then
+              echo "  WARNING: $f has no RaiTsumugu.VccErrorFix namespace"
+            else
+              echo "  $f: OK"
+            fi
+          done

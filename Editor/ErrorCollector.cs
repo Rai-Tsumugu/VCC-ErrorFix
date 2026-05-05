@@ -142,7 +142,7 @@ namespace RaiTsumugu.VccErrorFix.Editor
             }
         }
 
-        private static void ParseStackTrace(string stackTrace, out string filePath, out int lineNumber)
+        internal static void ParseStackTrace(string stackTrace, out string filePath, out int lineNumber)
         {
             filePath = string.Empty;
             lineNumber = -1;
@@ -155,7 +155,7 @@ namespace RaiTsumugu.VccErrorFix.Editor
             int.TryParse(match.Groups["line"].Value, out lineNumber);
         }
 
-        private static string MakeProjectRelative(string absolutePath)
+        internal static string MakeProjectRelative(string absolutePath)
         {
             if (string.IsNullOrEmpty(absolutePath)) return string.Empty;
             string projectRoot = System.IO.Path.GetFullPath(
