@@ -26,27 +26,44 @@ Unity Editor 内で発生したコンパイルエラー・ランタイムエラ�
 
 ---
 
-## インストール
+## インストール（クリエイター向け）
 
 ### 1. Unity パッケージのインストール
 
 VCC でパッケージ `com.rai-tsumugu.vcc-errorfix` をプロジェクトに追加します。  
-インストール後、Unity Editor を開くと HTTP サーバー（デフォルト: ポート 7300）が自動的に起動します。
+インストール後、Unity Editor を開くと HTTP サーバー（デフォルト: ポート 7300）が自動的に起動します。  
+**Node.js は不要です。** MCP サーバーの実行ファイルがパッケージに同梱されています。
 
-### 2. MCP サーバーのビルド
+### 2. VS Code 連携設定の生成
+
+Unity Editor のダッシュボードを開き（`Tools > VCC ErrorFix > Open Dashboard`）、**Generate mcp.json** ボタンをクリックします。  
+プロジェクトルートの `.vscode/mcp.json` が自動生成され、VS Code + Claude から MCP ツールを使用できるようになります。  
+現在の OS に合った実行ファイル（Windows: `.exe`、macOS: `arm64` / `x64`）が自動的に選択されます。
+
+> 詳細な手順はクリエイター向けの [セットアップガイド](docs/セットアップガイド.md) を参照してください。
+
+## 開発者向け：MCP サーバーのビルド
+
+実行ファイルを再ビルドする場合は Node.js 20 以上が必要です。
 
 ```bash
 cd mcp-server
 npm install
+
+# TypeScript のビルド（テスト用）
 npm run build
+
+# 各 OS 向け単体実行ファイルを mcp-server/bin/ に生成
+npm run build:exe
 ```
 
-ビルド成功後、`mcp-server/dist/index.js` が生成されます。
+生成される実行ファイル:
 
-### 3. VS Code 連携設定の生成
-
-Unity Editor のダッシュボードを開き（`Tools > VCC ErrorFix > Open Dashboard`）、**Generate mcp.json** ボタンをクリックします。  
-プロジェクトルートの `.vscode/mcp.json` が自動生成され、VS Code + Claude から MCP ツールを使用できるようになります。
+| ファイル | 対象環境 |
+|---------|---------|
+| `bin/bundle-win-x64.exe` | Windows (x64) |
+| `bin/bundle-macos-x64` | macOS Intel |
+| `bin/bundle-macos-arm64` | macOS Apple Silicon |
 
 ---
 

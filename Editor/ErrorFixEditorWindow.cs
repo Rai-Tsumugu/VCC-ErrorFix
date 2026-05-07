@@ -246,7 +246,6 @@ namespace RaiTsumugu.VccErrorFix.Editor
 
         private void GenerateVscodeMcpJson()
         {
-            // Locate mcp-server/dist/index.js relative to this package
             string packageRoot = FindPackageRoot();
             if (packageRoot == null)
             {
@@ -255,11 +254,26 @@ namespace RaiTsumugu.VccErrorFix.Editor
                 return;
             }
 
-            string mcpServerPath = Path.Combine(packageRoot, "mcp-server", "dist", "index.js")
-                .Replace('\\', '/');
+            string command;
+            string argsJson;
 
-            string projectRoot = Path.GetFullPath(
-                Path.Combine(Application.dataPath, ".."));
+            string exePath = FindMcpExecutable(packageRoot);
+            if (exePath != null)
+            {
+                SetExecutablePermission(exePath);
+                command = exePath.Replace('\\', '/').Replace("\"", "\\\"");
+                argsJson = "[]";
+            }
+            else
+            {
+                // Fallback: use node if no pre-built executable is found
+                string indexJs = Path.Combine(packageRoot, "mcp-server", "dist", "index.js")
+                    .Replace('\\', '/').Replace("\"", "\\\"");
+                command = "node";
+                argsJson = "[\"" + indexJs + "\"]";
+            }
+
+            string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
             string vscodePath = Path.Combine(projectRoot, ".vscode");
             Directory.CreateDirectory(vscodePath);
 
@@ -268,8 +282,8 @@ namespace RaiTsumugu.VccErrorFix.Editor
                 "  \"servers\": {\n" +
                 "    \"vcc-errorfix\": {\n" +
                 "      \"type\": \"stdio\",\n" +
-                "      \"command\": \"node\",\n" +
-                "      \"args\": [\"" + mcpServerPath.Replace("\"", "\\\"") + "\"],\n" +
+                $"      \"command\": \"{command}\",\n" +
+                $"      \"args\": {argsJson},\n" +
                 "      \"env\": {\n" +
                 $"        \"UNITY_MCP_URL\": \"http://localhost:{ErrorFixSettings.Port}\"\n" +
                 "      }\n" +
@@ -282,6 +296,37 @@ namespace RaiTsumugu.VccErrorFix.Editor
             EditorUtility.DisplayDialog("VCC ErrorFix",
                 $".vscode/mcp.json を生成しました:\n{mcpJsonPath}\n\nVSCodeでこのフォルダを開いてClaudeからMCPを使用できます。",
                 "OK");
+        }
+
+        private static string FindMcpExecutable(string packageRoot)
+        {
+            string binDir = Path.Combine(packageRoot, "mcp-server", "bin");
+#if UNITY_EDITOR_WIN
+            string exeName = "bundle-win-x64.exe";
+#elif UNITY_EDITOR_OSX
+            bool isAppleSilicon = SystemInfo.processorType.Contains("Apple");
+            string exeName = isAppleSilicon ? "bundle-macos-arm64" : "bundle-macos-x64";
+#else
+            return null;
+#endif
+            string exePath = Path.Combine(binDir, exeName);
+            return File.Exists(exePath) ? exePath : null;
+        }
+
+        private static void SetExecutablePermission(string exePath)
+        {
+#if UNITY_EDITOR_OSX || UNITY_EDITOR_LINUX
+            try
+            {
+                var psi = new System.Diagnostics.ProcessStartInfo("chmod", $"+x \"{exePath}\"")
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                System.Diagnostics.Process.Start(psi)?.WaitForExit(2000);
+            }
+            catch { /* chmod failure is non-fatal */ }
+#endif
         }
 
         private static string FindPackageRoot()
