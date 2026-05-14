@@ -1,0 +1,28 @@
+{
+  "name": "VCC ErrorFix Repository",
+  "id": "com.rai-tsumugu.vcc-errorfix",
+  "url": "https://rai-tsumugu.github.io/VCC-ErrorFix/index.json",
+  "packages": [
+    {
+      "name": "VCC ErrorFix MCP Bridge",
+      "id": "com.rai-tsumugu.vcc-errorfix",
+      "versions": [
+        {
+          "version": "0.1.2",
+          "repo": "https://github.com/Rai-Tsumugu/VCC-ErrorFix",
+          "url": "https://github.com/Rai-Tsumugu/VCC-ErrorFix/releases/download/v0.1.2/com.rai-tsumugu.vcc-errorfix-0.1.2.zip"
+        },
+        {
+          "version": "0.1.1",
+          "repo": "https://github.com/Rai-Tsumugu/VCC-ErrorFix",
+          "url": "https://github.com/Rai-Tsumugu/VCC-ErrorFix/releases/download/v0.1.1/com.rai-tsumugu.vcc-errorfix-0.1.1.zip"
+        },
+        {
+          "version": "0.1.0",
+          "repo": "https://github.com/Rai-Tsumugu/VCC-ErrorFix",
+          "url": "https://github.com/Rai-Tsumugu/VCC-ErrorFix/releases/download/v0.1.0/com.rai-tsumugu.vcc-errorfix-0.1.0.zip"
+        }
+      ]
+    }
+  ]
+}
