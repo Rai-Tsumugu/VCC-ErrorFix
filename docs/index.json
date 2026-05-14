@@ -31,6 +31,19 @@
             "name": "rai-tsumugu"
           },
           "url": "https://github.com/Rai-Tsumugu/VCC-ErrorFix/releases/download/v0.1.1/com.rai-tsumugu.vcc-errorfix-0.1.1.zip"
+        },
+        "0.1.2": {
+          "name": "com.rai-tsumugu.vcc-errorfix",
+          "version": "0.1.2",
+          "displayName": "VCC ErrorFix MCP Bridge",
+          "description": "Streams Unity console errors and warnings to Claude via MCP for automatic error fixing.",
+          "unity": "2022.3",
+          "unityRelease": "0f1",
+          "license": "MIT",
+          "author": {
+            "name": "rai-tsumugu"
+          },
+          "url": "https://github.com/Rai-Tsumugu/VCC-ErrorFix/releases/download/v0.1.2/com.rai-tsumugu.vcc-errorfix-0.1.2.zip"
         }
       }
     }
