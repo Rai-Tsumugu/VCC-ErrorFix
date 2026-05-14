@@ -5,7 +5,21 @@
   "author": "rai-tsumugu",
   "packages": {
     "com.rai-tsumugu.vcc-errorfix": {
-      "versions": {}
+      "versions": {
+        "0.1.0": {
+          "name": "com.rai-tsumugu.vcc-errorfix",
+          "version": "0.1.0",
+          "displayName": "VCC ErrorFix MCP Bridge",
+          "description": "Streams Unity console errors and warnings to Claude via MCP for automatic error fixing.",
+          "unity": "2022.3",
+          "unityRelease": "0f1",
+          "license": "MIT",
+          "author": {
+            "name": "rai-tsumugu"
+          },
+          "url": "https://github.com/Rai-Tsumugu/VCC-ErrorFix/releases/download/v0.1.0/com.rai-tsumugu.vcc-errorfix-0.1.0.zip"
+        }
+      }
     }
   }
 }
