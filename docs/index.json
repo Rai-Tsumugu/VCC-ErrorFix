@@ -1,0 +1,11 @@
+{
+  "name": "Rai-Tsumugu's Packages",
+  "id": "com.rai-tsumugu",
+  "url": "https://rai-tsumugu.github.io/VCC-ErrorFix/index.json",
+  "author": "rai-tsumugu",
+  "packages": {
+    "com.rai-tsumugu.vcc-errorfix": {
+      "versions": {}
+    }
+  }
+}

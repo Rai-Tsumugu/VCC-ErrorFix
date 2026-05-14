@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*.[0-9]*.[0-9]*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+          echo "ZIPNAME=com.rai-tsumugu.vcc-errorfix-${VERSION}.zip" >> $GITHUB_OUTPUT
+
+      - name: Build package zip
+        run: |
+          zip -r "${{ steps.version.outputs.ZIPNAME }}" \
+            package.json \
+            Editor/ \
+            Tests/ \
+            README.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.version.outputs.ZIPNAME }}
+          generate_release_notes: true
+
+      - name: Update VPM listing
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          ZIPNAME="${{ steps.version.outputs.ZIPNAME }}"
+          ZIP_URL="https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/${ZIPNAME}"
+
+          jq --arg v "${VERSION}" --arg url "${ZIP_URL}" \
+            '.packages["com.rai-tsumugu.vcc-errorfix"].versions[$v] = {
+              "name": "com.rai-tsumugu.vcc-errorfix",
+              "version": $v,
+              "displayName": "VCC ErrorFix MCP Bridge",
+              "description": "Streams Unity console errors and warnings to Claude via MCP for automatic error fixing.",
+              "unity": "2022.3",
+              "unityRelease": "0f1",
+              "license": "MIT",
+              "author": {"name": "rai-tsumugu"},
+              "url": $url
+            }' docs/index.json > docs/index.json.tmp && mv docs/index.json.tmp docs/index.json
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/index.json
+          git commit -m "chore: update VPM listing for v${VERSION} [skip ci]"
+          git push origin HEAD:main

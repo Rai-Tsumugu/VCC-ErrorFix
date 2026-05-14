@@ -30,8 +30,18 @@ Unity Editor 内で発生したコンパイルエラー・ランタイムエラ�
 
 ### 1. Unity パッケージのインストール
 
-VCC でパッケージ `com.rai-tsumugu.vcc-errorfix` をプロジェクトに追加します。  
+1. VCC を開き、**Settings → Packages → Add Repository** を選択します
+2. 以下の URL を入力して **Add** をクリックします：
+   ```
+   https://rai-tsumugu.github.io/VCC-ErrorFix/index.json
+   ```
+3. 対象プロジェクトの **Manage Packages** を開き、`VCC ErrorFix MCP Bridge` をインストールします
+
 インストール後、Unity Editor を開くと HTTP サーバー（デフォルト: ポート 7300）が自動的に起動します。
+
+> **GitHub Pages の有効化（初回のみ）**  
+> リポジトリの **Settings → Pages → Source** で  
+> `Deploy from a branch` / Branch: `main` / Folder: `/docs` を選択して Save してください。
 
 ### 2. MCP サーバーのビルド
 
