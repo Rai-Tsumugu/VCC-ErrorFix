@@ -197,9 +197,9 @@ namespace RaiTsumugu.VccErrorFix.Editor
 
                         if (!string.IsNullOrEmpty(entry.stackTrace))
                         {
+                            var lines = entry.stackTrace.Split('\n');
                             string preview = string.Join("\n",
-                                entry.stackTrace.Split('\n'), 0,
-                                Math.Min(3, entry.stackTrace.Split('\n').Length));
+                                lines, 0, Math.Min(3, lines.Length));
                             EditorGUILayout.LabelField(preview, EditorStyles.miniLabel);
                         }
                     }
@@ -255,7 +255,7 @@ namespace RaiTsumugu.VccErrorFix.Editor
                 return;
             }
 
-            string mcpServerPath = Path.Combine(packageRoot, "mcp-server", "dist", "index.js")
+            string mcpServerPath = Path.Combine(packageRoot, "mcp-server", "dist", "bundle.js")
                 .Replace('\\', '/');
 
             string projectRoot = Path.GetFullPath(

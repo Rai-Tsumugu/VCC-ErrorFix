@@ -39,10 +39,6 @@ Unity Editor 内で発生したコンパイルエラー・ランタイムエラ�
 
 インストール後、Unity Editor を開くと HTTP サーバー（デフォルト: ポート 7300）が自動的に起動します。
 
-> **GitHub Pages の有効化（初回のみ）**  
-> リポジトリの **Settings → Pages → Source** で  
-> `Deploy from a branch` / Branch: `main` / Folder: `/docs` を選択して Save してください。
-
 ### 2. MCP サーバーのビルド
 
 ```bash
@@ -53,10 +49,36 @@ npm run build
 
 ビルド成功後、`mcp-server/dist/index.js` が生成されます。
 
-### 3. VS Code 連携設定の生成
+### 3. MCP クライアントの設定
+
+#### GitHub Copilot (VS Code)
 
 Unity Editor のダッシュボードを開き（`Tools > VCC ErrorFix > Open Dashboard`）、**Generate mcp.json** ボタンをクリックします。  
-プロジェクトルートの `.vscode/mcp.json` が自動生成され、VS Code + Claude から MCP ツールを使用できるようになります。
+プロジェクトルートに `.vscode/mcp.json` が自動生成されます。
+
+#### Claude Code
+
+`mcp-server/dist/index.js` の絶対パスを確認し、以下のコマンドを実行します：
+
+```bash
+claude mcp add vcc-errorfix -e UNITY_MCP_URL=http://localhost:7300 -- node /絶対パス/mcp-server/dist/index.js
+```
+
+または、プロジェクトの `.claude/settings.json` に手動で追記します：
+
+```json
+{
+  "mcpServers": {
+    "vcc-errorfix": {
+      "command": "node",
+      "args": ["/絶対パス/mcp-server/dist/index.js"],
+      "env": {
+        "UNITY_MCP_URL": "http://localhost:7300"
+      }
+    }
+  }
+}
+```
 
 ---
 
@@ -87,7 +109,7 @@ Unity Editor のダッシュボードを開き（`Tools > VCC ErrorFix > Open Da
 
 ```
 コンパイルエラー: N  ランタイムエラー: N  警告: N
-                          [Clear All] [Export JSON] [Generate mcp.json]
+[Clear All] [Export JSON] [Generate mcp.json]
 ```
 
 | ボタン | 動作 |
@@ -316,7 +338,9 @@ Unity のエラーバッファをクリアします。エラーを読んで修�
 
 ---
 
-## .vscode/mcp.json の形式
+## 設定ファイルの形式
+
+### GitHub Copilot (VS Code) — `.vscode/mcp.json`
 
 **Generate mcp.json** ボタンで生成されるファイルの例:
 
@@ -325,6 +349,22 @@ Unity のエラーバッファをクリアします。エラーを読んで修�
   "servers": {
     "vcc-errorfix": {
       "type": "stdio",
+      "command": "node",
+      "args": ["/path/to/package/mcp-server/dist/index.js"],
+      "env": {
+        "UNITY_MCP_URL": "http://localhost:7300"
+      }
+    }
+  }
+}
+```
+
+### Claude Code — `.claude/settings.json`
+
+```json
+{
+  "mcpServers": {
+    "vcc-errorfix": {
       "command": "node",
       "args": ["/path/to/package/mcp-server/dist/index.js"],
       "env": {

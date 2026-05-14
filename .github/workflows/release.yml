@@ -24,13 +24,24 @@ jobs:
           echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
           echo "ZIPNAME=com.rai-tsumugu.vcc-errorfix-${VERSION}.zip" >> $GITHUB_OUTPUT
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build MCP server bundle
+        run: |
+          cd mcp-server
+          npm ci
+          npm run build
+
       - name: Build package zip
         run: |
           zip -r "${{ steps.version.outputs.ZIPNAME }}" \
             package.json \
             Editor/ \
             Tests/ \
-            README.md
+            README.md \
+            mcp-server/dist/bundle.js
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
